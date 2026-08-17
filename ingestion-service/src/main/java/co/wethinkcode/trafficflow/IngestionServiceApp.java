@@ -18,6 +18,8 @@ public class IngestionServiceApp {
     private static ArrayNode available_data = null;
 
     public static void main(String[] args) {
+        ObjectMapper mapper = new ObjectMapper();
+
         Javalin app = Javalin.create().start(7020);
 
         app.get("/health", ctx -> ctx.result("OK"));
@@ -25,11 +27,9 @@ public class IngestionServiceApp {
         // TODO: read and clean src/main/resources/intersections-legacy.csv (intersections, districts, signal types data —
         // trim whitespace, fix casing, normalize dates/booleans) and expose the
         // cleaned records here for the other services to consume.
-        try {
-            System.out.println(readAndCleanCSV().toPrettyString());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+
+        app.get("/intersections", ctx -> ctx.result(mapper.writeValueAsString(readAndCleanCSV())));
+
     }
 
     private static ArrayNode readAndCleanCSV() throws IOException {
